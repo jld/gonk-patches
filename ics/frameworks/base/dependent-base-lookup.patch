@@ -1,0 +1,27 @@
+commit 2404ef0fd5c4569f329bf88b8c2e171fac321a77
+Author: Jed Davis <jld@mozilla.com>
+Date:   Tue Mar 26 10:01:46 2013 -0700
+
+    Apply dependent base lookup fix to all compilers, not just Clang.
+    
+    This was an actual error in the code, and GCC >=4.7 also flags it.
+    
+    No functional change intended; this simply makes the previously implicit
+    this-> explicit.
+
+diff --git a/include/utils/KeyedVector.h b/include/utils/KeyedVector.h
+index 3419d81..5e62755 100644
+--- a/include/utils/KeyedVector.h
++++ b/include/utils/KeyedVector.h
+@@ -190,11 +190,7 @@ DefaultKeyedVector<KEY,VALUE>::DefaultKeyedVector(const VALUE& defValue)
+ 
+ template<typename KEY, typename VALUE> inline
+ const VALUE& DefaultKeyedVector<KEY,VALUE>::valueFor(const KEY& key) const {
+-#ifdef __clang__
+     ssize_t i = this->indexOfKey(key);
+-#else
+-    ssize_t i = indexOfKey(key);
+-#endif
+     return i >= 0 ? KeyedVector<KEY,VALUE>::valueAt(i) : mDefault;
+ }
+ 
